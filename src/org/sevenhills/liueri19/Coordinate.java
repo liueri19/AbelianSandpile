@@ -14,10 +14,6 @@ public class Coordinate implements Comparable<Coordinate> {
 		this.PLANE = plane;
 	}
 	
-	public int getNumSand() {
-		return numSand;
-	}
-	
 	public void addSand() {
 		numSand++;
 		this.checkSpill();
