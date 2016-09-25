@@ -28,7 +28,6 @@ public class Plane {
 			coordinates.add(-index - 1, c);
 			return c;
 		}
-		if (coordinates.get(index) == null) System.out.println("WHAT????");
 		return coordinates.get(index);
 	}
 	
@@ -42,9 +41,10 @@ public class Plane {
 	public void output() {
 		logger.log("Drop %d:", totalGrains);
 		Coordinate prevC = null;
+		int yMax = coordinates.get(0).Y;
 		for (Coordinate c : coordinates) {
 			if (prevC == null || prevC.Y != c.Y)
-				logger.log("\n%d ", c.numSand);
+				logger.log("\n%s%d ", new String(new char[2 * (yMax + c.X)]).replace("\0", " "), c.numSand);
 			else
 				logger.log("%d ", c.numSand);
 			prevC = c;
@@ -54,7 +54,7 @@ public class Plane {
 	
 	public static void main(String[] args) {
 		Plane plane = new Plane();
-		for (int i = 0; i < 1000; i++)
+		for (int i = 0; i < 700; i++)
 			plane.refresh();
 		plane.logger.closeFile();
 	}
