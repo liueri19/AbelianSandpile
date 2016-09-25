@@ -61,7 +61,7 @@ public class Plane {
 	public static void main(String[] args) {
 		Plane plane = new Plane();
 		//output as file
-		for (int i = 0; i < 50000; i++) {
+		for (int i = 0; i < 333333; i++) {
 			plane.refresh();
 			System.out.printf("Drop %d;\n", plane.totalGrains);
 		}
@@ -91,9 +91,9 @@ public class Plane {
 		if (grains == 0)
 			return Color.BLACK;
 		if (grains == 1)
-			return Color.RED;
+			return new Color(85, 85, 85);
 		if (grains == 2)
-			return Color.GREEN;
-		return Color.BLUE;
+			return new Color(170, 170, 170);
+		return Color.WHITE;
 	}
 }
