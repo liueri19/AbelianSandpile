@@ -59,9 +59,9 @@ public class Plane {
 	}
 	
 	public static void main(String[] args) {
-		Plane plane = new Plane();
+		Plane plane = new Plane(6);
 		//output as file
-		for (int i = 0; i < 333333; i++) {
+		for (int i = 0; i < 99999; i++) {
 			plane.refresh();
 			System.out.printf("Drop %d;\n", plane.totalGrains);
 		}
@@ -69,13 +69,13 @@ public class Plane {
 		plane.logger.closeFile();
 		
 		//output as image
-		File file = new File("result_Drop" + plane.totalGrains + ".gif");
+		File file = new File("result_Drop" + plane.totalGrains + "_ST" + plane.SPILL_THRESHOLD + ".gif");
 		int yMax = plane.coordinates.get(0).Y;
 		int sideLength = 2 * yMax + 1;
 		BufferedImage image = new BufferedImage(sideLength, sideLength, BufferedImage.TYPE_INT_ARGB);
 		//draw image
 		for (Coordinate c : plane.coordinates) {
-			image.setRGB(c.X + yMax, c.Y + yMax, getMatchingColor(c.numSand).getRGB());
+			image.setRGB(c.X + yMax, c.Y + yMax, getMatchingColor(plane.SPILL_THRESHOLD, c.numSand).getRGB());
 		}
 		//write image
 		try {
@@ -87,13 +87,8 @@ public class Plane {
 	}
 	
 	//helper method for drawing image
-	static Color getMatchingColor(int grains) {
-		if (grains == 0)
-			return Color.BLACK;
-		if (grains == 1)
-			return new Color(85, 85, 85);
-		if (grains == 2)
-			return new Color(170, 170, 170);
-		return Color.WHITE;
+	static Color getMatchingColor(int spillThreshold, int grains) {
+		int rgbValue = 255 / spillThreshold * grains;
+		return new Color(rgbValue, rgbValue, rgbValue);
 	}
 }

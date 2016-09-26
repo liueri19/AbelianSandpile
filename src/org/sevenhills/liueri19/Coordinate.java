@@ -25,7 +25,7 @@ public class Coordinate implements Comparable<Coordinate> {
 	}
 	
 	public void spill() {
-		numSand = 0;
+		numSand = numSand-4;
 		if (surroundings[0] == null)
 			initSurroundings();
 		surroundings[0].addSand();
