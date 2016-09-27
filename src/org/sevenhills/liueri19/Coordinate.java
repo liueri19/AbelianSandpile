@@ -6,12 +6,13 @@ public class Coordinate implements Comparable<Coordinate> {
 	final int Y;
 	final Plane PLANE;
 	int numSand = 0; //number of sand grains at this coordinate
-	Coordinate[] surroundings = new Coordinate[4];
+	Coordinate[] surroundings;
 	
 	public Coordinate(int x, int y, Plane plane) {
 		this.X = x;
 		this.Y = y;
 		this.PLANE = plane;
+		this.surroundings = new Coordinate[plane.numSurroundings];
 	}
 	
 	public void addSand() {
@@ -25,20 +26,34 @@ public class Coordinate implements Comparable<Coordinate> {
 	}
 	
 	public void spill() {
-		numSand = numSand-4;
+		numSand = numSand - PLANE.numSurroundings;
 		if (surroundings[0] == null)
 			initSurroundings();
-		surroundings[0].addSand();
-		surroundings[1].addSand();
-		surroundings[2].addSand();
-		surroundings[3].addSand();
+		for (Coordinate c : surroundings)
+			c.addSand();
 	}
 	
 	private void initSurroundings() {
+		//the following code is bugged:
+		/*int index = 0;
+		for (int deltaX = -1; deltaX < 2; deltaX++) {
+			for (int deltaY = -1; deltaY < 2; deltaY++) {
+				if (deltaX == 0 && deltaY == 0)
+					break;
+				surroundings[index] = PLANE.getCoordinate(X + deltaX, Y + deltaY);
+				index++;
+			}
+		}*/
+		//equivalent code:
 		surroundings[0] = PLANE.getCoordinate(X-1, Y);
 		surroundings[1] = PLANE.getCoordinate(X+1, Y);
 		surroundings[2] = PLANE.getCoordinate(X, Y-1);
 		surroundings[3] = PLANE.getCoordinate(X, Y+1);
+		//uncomment following for numSurroundings == 8:
+/*		surroundings[4] = PLANE.getCoordinate(X-1, Y-1);
+		surroundings[5] = PLANE.getCoordinate(X+1, Y+1);
+		surroundings[6] = PLANE.getCoordinate(X+1, Y-1);
+		surroundings[7] = PLANE.getCoordinate(X-1, Y+1);*/
 	}
 
 	//this specific way of comparing is purposed to make output easier to implement.

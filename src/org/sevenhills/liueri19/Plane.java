@@ -13,17 +13,16 @@ public class Plane {
 	//The plane the sandpile will be built on
 	final int SPILL_THRESHOLD; //sand grains should stack until exceeds this threshold, default to 3
 	int totalGrains = 0;
+	int numSurroundings;
+	Coordinate origin;
 	List<Coordinate> coordinates = new ArrayList<Coordinate>();
-	Coordinate origin = new Coordinate(0, 0, this);
 	Logger logger = new Logger();
 	
-	public Plane(int spillThreshold) {
+	public Plane(int spillThreshold, int numSurroundings) {
 		this.SPILL_THRESHOLD = spillThreshold;
+		this.numSurroundings = numSurroundings;
+		origin = new Coordinate(0, 0, this);
 		coordinates.add(origin);
-	}
-	
-	public Plane() {
-		this(3);
 	}
 	
 	public Coordinate getCoordinate(int x, int y) {
@@ -59,9 +58,17 @@ public class Plane {
 	}
 	
 	public static void main(String[] args) {
-		Plane plane = new Plane(6);
+		//define constants for the plane
+		//int spillThreshold = 7;
+		int spillThreshold = 3;
+		int dorpsOfSand = 99999;
+		//to which surroundings coordinates should one coordinate spill to:
+		//int numSurroundings = 8;
+		int numSurroundings = 4;
+		
+		Plane plane = new Plane(spillThreshold, numSurroundings);
 		//output as file
-		for (int i = 0; i < 99999; i++) {
+		for (int i = 0; i < dorpsOfSand; i++) {
 			plane.refresh();
 			System.out.printf("Drop %d;\n", plane.totalGrains);
 		}
@@ -74,9 +81,8 @@ public class Plane {
 		int sideLength = 2 * yMax + 1;
 		BufferedImage image = new BufferedImage(sideLength, sideLength, BufferedImage.TYPE_INT_ARGB);
 		//draw image
-		for (Coordinate c : plane.coordinates) {
+		for (Coordinate c : plane.coordinates)
 			image.setRGB(c.X + yMax, c.Y + yMax, getMatchingColor(plane.SPILL_THRESHOLD, c.numSand).getRGB());
-		}
 		//write image
 		try {
 			ImageIO.write(image, "gif", file);
