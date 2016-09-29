@@ -76,16 +76,15 @@ public class Plane {
 		plane.logger.closeFile();
 		
 		//output as image
-		File file = new File("result_Drop" + plane.totalGrains + "_ST" + plane.SPILL_THRESHOLD + ".gif");
 		int yMax = plane.coordinates.get(0).Y;
 		int sideLength = 2 * yMax + 1;
-		BufferedImage image = new BufferedImage(sideLength, sideLength, BufferedImage.TYPE_INT_ARGB);
+		ImgPrinter img = new ImgPrinter(sideLength, sideLength, BufferedImage.TYPE_INT_ARGB);
 		//draw image
 		for (Coordinate c : plane.coordinates)
-			image.setRGB(c.X + yMax, c.Y + yMax, getMatchingColor(plane.SPILL_THRESHOLD, c.numSand).getRGB());
+			img.setRGB(c.X + yMax, c.Y + yMax, getMatchingColor(plane.SPILL_THRESHOLD, c.numSand));
 		//write image
 		try {
-			ImageIO.write(image, "gif", file);
+			img.print("gif", "result_Drop" + plane.totalGrains + "_ST" + plane.SPILL_THRESHOLD + ".gif");
 		} catch (IOException e) {
 			System.out.println("Failed to write new image file, here's the stack trace:");
 			e.printStackTrace();
