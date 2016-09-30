@@ -2,8 +2,6 @@ package org.sevenhills.liueri19;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
