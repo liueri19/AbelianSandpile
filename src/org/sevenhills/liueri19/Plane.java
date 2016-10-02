@@ -1,20 +1,28 @@
 package org.sevenhills.liueri19;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Plane {
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+public class Plane extends JPanel {
+	//in development, known bugs not fixed
+	
+	private static final long serialVersionUID = 1L;
 	//The plane the sandpile will be built on
 	final int SPILL_THRESHOLD; //sand grains should stack until exceeds this threshold, default to 3
 	int totalGrains = 0;
 	int numSurroundings;
 	Coordinate origin;
-	List<Coordinate> coordinates = new ArrayList<Coordinate>();
-	Logger logger = new Logger();
+	List<Coordinate> coordinates = Collections.synchronizedList(new ArrayList<Coordinate>()); //unsynchronized list will rise CME 
+/*	Logger logger = new Logger();*/ //logging feature not needed during development
 	
 	public Plane(int spillThreshold, int numSurroundings) {
 		this.SPILL_THRESHOLD = spillThreshold;
@@ -23,7 +31,7 @@ public class Plane {
 		coordinates.add(origin);
 	}
 	
-	public Coordinate getCoordinate(int x, int y) {
+	Coordinate getCoordinate(int x, int y) {
 		int index = Collections.binarySearch(coordinates, new Coordinate(x, y, this));
 		if (index < 0) {
 			Coordinate c = new Coordinate(x, y, this);
@@ -33,15 +41,21 @@ public class Plane {
 		return coordinates.get(index);
 	}
 	
-	public void refresh() {
+	void refresh() {
 		origin.addSand();
 		totalGrains++;
 		Collections.sort(coordinates);
-		//maybe not print after every single drop
-		//this.output();
 	}
 	
-	public void output() {
+	@Override
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		for (Coordinate c : coordinates) {
+			g.drawImage(getMatchingPixel(SPILL_THRESHOLD, c.numSand), c.X+149, c.Y+149, null);
+		}
+	}
+	
+/*	void outputLog() {
 		logger.log("Drop %d:", totalGrains);
 		Coordinate prevC = null;
 		int yMax = coordinates.get(0).Y;
@@ -53,26 +67,38 @@ public class Plane {
 			prevC = c;
 		}
 		logger.log("\n");
-	}
+	}*/
 	
 	public static void main(String[] args) {
 		//define constants for the plane
 		//int spillThreshold = 7;
 		int spillThreshold = 3;
-		int dorpsOfSand = 99999;
+		int dorpsOfSand = 9999;
 		//to which surroundings coordinates should one coordinate spill to:
 		//int numSurroundings = 8;
 		int numSurroundings = 4;
 		
+		//run simulation, real time graphical display
 		Plane plane = new Plane(spillThreshold, numSurroundings);
-		//output as file
+		//setup JFrame
+		JFrame frame = new JFrame();
+		Dimension d = new Dimension(300, 300);
+		frame.setMinimumSize(d);
+		frame.setSize(d);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setTitle("AbelianSandpile_Extended");
+		frame.add(plane);
+		frame.pack();
+		frame.setVisible(true);
 		for (int i = 0; i < dorpsOfSand; i++) {
 			plane.refresh();
+			plane.repaint();
 			System.out.printf("Drop %d;\n", plane.totalGrains);
 		}
-		plane.output();
-		plane.logger.closeFile();
 		
+		//output as file
+/*		plane.outputLog();
+		plane.logger.closeFile();*/
 		//output as image
 		int yMax = plane.coordinates.get(0).Y;
 		int sideLength = 2 * yMax + 1;
@@ -87,12 +113,20 @@ public class Plane {
 			System.out.println("Failed to write new image file, here's the stack trace:");
 			e.printStackTrace();
 		}
+		
 	}
 	
 	//helper method for drawing image
 	static Color getMatchingColor(int spillThreshold, int grains) {
 		int rgbValue = 255 / spillThreshold * grains;
 		return new Color(rgbValue, rgbValue, rgbValue);
+	}
+	
+	static BufferedImage getMatchingPixel(int spillThreshold, int grains) {
+		Color color = getMatchingColor(spillThreshold, grains);
+		BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+		img.setRGB(0, 0, color.getRGB());
+		return img;
 	}
 }
 
