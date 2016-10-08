@@ -21,7 +21,7 @@ public class Plane extends JPanel {
 	int totalGrains = 0;
 	int numSurroundings;
 	Coordinate origin;
-	List<Coordinate> coordinates = Collections.synchronizedList(new ArrayList<Coordinate>()); //unsynchronized list will rise CME 
+	List<Coordinate> coordinates = Collections.synchronizedList(new ArrayList<Coordinate>()); //synchronize list to avoid CME
 /*	Logger logger = new Logger();*/ //logging feature not needed during development
 	
 	public Plane(int spillThreshold, int numSurroundings) {
@@ -50,8 +50,10 @@ public class Plane extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		for (Coordinate c : coordinates) {
-			g.drawImage(getMatchingPixel(SPILL_THRESHOLD, c.numSand), c.X+149, c.Y+149, null);
+		synchronized(coordinates) { //need manual synchronization when iterating over the list
+			for (Coordinate c : coordinates) {
+				g.drawImage(getMatchingPixel(SPILL_THRESHOLD, c.numSand), c.X+149, c.Y+149, null);
+			}
 		}
 	}
 	
