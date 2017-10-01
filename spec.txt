@@ -4,3 +4,4 @@ There should be a representation for the ground and the grains of sand.
 The ground should be a grid. It should know how many grains of sand exist in each cell.
 
 Sand grains will be continuously added to an arbitrary cell on the ground. After reaching a specific threshold, the stack of sand should spill, sending its grains to adjacent cells.
+After each grain of sand is added to the origin, the entire grid should be updated repeatedly to complete any chain effect.
