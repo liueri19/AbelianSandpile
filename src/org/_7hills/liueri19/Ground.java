@@ -2,6 +2,7 @@ package org._7hills.liueri19;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,13 +16,13 @@ public class Ground extends JPanel {
 	public final int SPILL_THRESHOLD;
 	private int totalGrains = 1000;
 	private Cell[][] cells;
-	private int offset;
+	private int offset, sideLength;	//offset is half of sideLength
 	private Cell origin = new Cell(0, 0, this);
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
 	
 	public Ground(int spillThreshold) {
 		SPILL_THRESHOLD = spillThreshold;
-		int sideLength = (int) Math.sqrt(totalGrains / Math.PI) * 2;
+		sideLength = (int) Math.sqrt(totalGrains / Math.PI) * 2;
 		cells = new Cell[sideLength][sideLength];	//init a 2d array guaranteed to hold all sand
 		offset = sideLength / 2;
 		addSand(0, 0);
@@ -35,7 +36,7 @@ public class Ground extends JPanel {
 		//setup the window
 		Ground ground = new Ground();
 		JFrame frame = new JFrame("Sand Pile");
-		ground.setPreferredSize(new Dimension(1000, 1000));
+		ground.setPreferredSize(new Dimension(ground.sideLength, ground.sideLength));
 		ground.setBackground(Color.WHITE);
 		frame.add(ground);
 		frame.pack();
@@ -82,6 +83,8 @@ public class Ground extends JPanel {
 
 	@Override
 	public void paintComponent(Graphics graphics) {
+		//construct an image
+		BufferedImage image = new BufferedImage(sideLength, sideLength, BufferedImage.TYPE_INT_ARGB);
 
 	}
 }

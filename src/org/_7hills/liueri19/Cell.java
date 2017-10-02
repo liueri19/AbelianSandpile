@@ -1,5 +1,7 @@
 package org._7hills.liueri19;
 
+import java.awt.*;
+
 /**
  * Each cell hold a certain amount of sand grains.
  */
@@ -48,6 +50,16 @@ public class Cell {
 
 	public int getY() {
 		return y;
+	}
+
+	public Color toColor() {
+		//can do this
+//		int rgb = red;
+//		rgb = (rgb << 8) + green;
+//		rgb = (rgb << 8) + blue;
+		//
+		int grayValue = (int) (255 - 255f / sandGrains);
+		return new Color(grayValue, grayValue, grayValue);
 	}
 
 //	//this specific way of comparing is purposed to make output easier to implement.
