@@ -14,7 +14,7 @@ public class Ground extends JPanel {
 	 * Sand grains would spill once exceeding this threshold, default to 4.
 	 */
 	public final int SPILL_THRESHOLD;
-	private int totalGrains = 1000;
+	private int totalGrains = 100000;
 	private Cell[][] cells;
 	private int offset, sideLength;	//offset is half of sideLength
 	private Cell origin = new Cell(0, 0, this);
@@ -49,7 +49,7 @@ public class Ground extends JPanel {
 			//add a sand, update, wait
 			ground.origin.addSand();
 			ground.updateSandPile();
-			Thread.sleep(250);
+			Thread.sleep(10);
 		}
 	}
 
@@ -64,6 +64,16 @@ public class Ground extends JPanel {
 			cells[x + offset][y + offset] = new Cell(x, y, this);
 		else
 			cell.addSand();
+	}
+
+	/**
+	 * Return the cell at the specified location.
+	 * @param x	the row of the desired cell
+	 * @param y	the column of the desired cell
+	 * @return	the cell at the specified location, may be null
+	 */
+	public Cell getCellAt(int x, int y) {
+		return cells[x][y];
 	}
 
 	public void updateSandPile() {
@@ -85,6 +95,15 @@ public class Ground extends JPanel {
 	public void paintComponent(Graphics graphics) {
 		//construct an image
 		BufferedImage image = new BufferedImage(sideLength, sideLength, BufferedImage.TYPE_INT_ARGB);
-
+		for (int x = 0; x < sideLength; x++) {
+			for (int y = 0; y < sideLength; y++) {
+				Cell cell = getCellAt(x, y);
+				if (cell == null)
+					image.setRGB(x, y, Color.WHITE.getRGB());
+				else
+					image.setRGB(x, y, getCellAt(x, y).getColor());
+			}
+		}
+		graphics.drawImage(image, 0, 0, null);
 	}
 }
