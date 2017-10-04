@@ -14,15 +14,26 @@ public class Ground extends JPanel {
 	 * Sand grains would spill once exceeding this threshold, default to 4.
 	 */
 	public final int SPILL_THRESHOLD;
-	private int totalGrains = 100000;
+	/**
+	 * Size of the window in pixels.
+	 */
+	public static final int FRAME_DIMENSION = 1000;
+	/**
+	 * The delay between each grain is draped. Increase this value will slow down the process.
+	 */
+	public static final int DELAY = 10;
+	/**
+	 * Total number grains of sand to drop.
+	 */
+	private final int TOTAL_GRAINS = 1000;
 	private Cell[][] cells;
 	private int offset, sideLength;	//offset is half of sideLength
-	private Cell origin = new Cell(0, 0, this);
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
+	private volatile boolean completed = false;
 	
 	public Ground(int spillThreshold) {
 		SPILL_THRESHOLD = spillThreshold;
-		sideLength = (int) Math.sqrt(totalGrains / Math.PI) * 2;
+		sideLength = (int) (Math.sqrt(TOTAL_GRAINS / Math.PI)) * 2;	//guaranteed even
 		cells = new Cell[sideLength][sideLength];	//init a 2d array guaranteed to hold all sand
 		offset = sideLength / 2;
 		addSand(0, 0);
@@ -36,21 +47,29 @@ public class Ground extends JPanel {
 		//setup the window
 		Ground ground = new Ground();
 		JFrame frame = new JFrame("Sand Pile");
-		ground.setPreferredSize(new Dimension(ground.sideLength, ground.sideLength));
 		ground.setBackground(Color.WHITE);
+		frame.setPreferredSize(new Dimension(FRAME_DIMENSION, FRAME_DIMENSION));
 		frame.add(ground);
 		frame.pack();
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		//thread for repaint
-		ground.executor.submit((Runnable) ground::repaint);	//the same thing as new Runnable calling repaint
+		//I found this more intuitive than the lambda version
+		ground.executor.submit(new Runnable() {
+			@Override
+			public void run() {
+				while (!ground.completed)
+					ground.repaint();
+			}
+		});
 
-		for (int grain = 0; grain < ground.totalGrains; grain++) {
+		for (int grain = 0; grain < ground.TOTAL_GRAINS; grain++) {
 			//add a sand, update, wait
-			ground.origin.addSand();
+			ground.addSand(0, 0);
 			ground.updateSandPile();
-			Thread.sleep(10);
+			Thread.sleep(DELAY);
 		}
+		ground.completed = true;
 	}
 
 	/**
@@ -68,12 +87,12 @@ public class Ground extends JPanel {
 
 	/**
 	 * Return the cell at the specified location.
-	 * @param x	the row of the desired cell
-	 * @param y	the column of the desired cell
+	 * @param x	the row index of the desired cell
+	 * @param y	the column index of the desired cell
 	 * @return	the cell at the specified location, may be null
 	 */
-	public Cell getCellAt(int x, int y) {
-		return cells[x][y];
+	private Cell getCellAt(int x, int y) {
+		return cells[x][y];	//no offset is intended
 	}
 
 	public void updateSandPile() {
@@ -93,17 +112,17 @@ public class Ground extends JPanel {
 
 	@Override
 	public void paintComponent(Graphics graphics) {
-		//construct an image
-		BufferedImage image = new BufferedImage(sideLength, sideLength, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage image = new BufferedImage(sideLength, sideLength, BufferedImage.TYPE_INT_RGB);
 		for (int x = 0; x < sideLength; x++) {
 			for (int y = 0; y < sideLength; y++) {
 				Cell cell = getCellAt(x, y);
 				if (cell == null)
 					image.setRGB(x, y, Color.WHITE.getRGB());
-				else
-					image.setRGB(x, y, getCellAt(x, y).getColor());
+				else {
+					image.setRGB(x, y, cell.getColor());
+				}
 			}
 		}
-		graphics.drawImage(image, 0, 0, null);
+		graphics.drawImage(image, 0, 0, FRAME_DIMENSION, FRAME_DIMENSION, null);
 	}
 }
