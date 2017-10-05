@@ -1,7 +1,14 @@
 This is the specification for the AbelianSandpile project.
+The end result should have the following implemented, your task is to complete whatever is left out.
 
-There should be a representation for the ground and the grains of sand.
-The ground should be a grid. It should know how many grains of sand exist in each cell.
+There should be a representation of the ground. The ground should hold information about where the sand grains are.
+The ground should be a grid, each cell in the grid should know how many sand grains are stacked on it.
 
-Sand grains will be continuously added to an arbitrary cell on the ground. After reaching a specific threshold, the stack of sand should spill, sending its grains to adjacent cells.
-After each grain of sand is added to the origin, the entire grid should be updated repeatedly to complete any chain effect.
+A certain number of sand grains will be added to an arbitrary cell on the ground. After reaching a specific threshold, the stack of sand should spill, sending its grains to adjacent cells.
+The threshold will be 5, that is, the maximum number of sand grains one cell can hold is 4. One more grain on the cell and it would spill.
+When a cell spill, it should send 4 grains to 4 adjacent cells, and leave any remaining sand on that cell.
+Executing the above procedures will cause chain effects. You may implement that however you like. Ene possible implementation would be to update the entire grid repeatedly after adding each grain until no spilling occurs.
+
+The end result of each sand pile simulation (for example, after 10000 grains of sand is dropped) should be a human readable output. It may be printed digits representing the number of sand grains on each cell. It may be stuff in a text file. A picture. Anything a human can directly see.
+
+You may also want to produce an output for each sand grain added to see the change after dropping each grain. This is optional however.

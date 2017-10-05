@@ -1,35 +1,27 @@
 package org._7hills.liueri19;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 /**
  * The ground to place the sand pile on.
  */
-public class Ground extends JPanel {
+public class Ground {
 	/**
 	 * Sand grains would spill once exceeding this threshold, default to 4.
 	 */
 	public final int SPILL_THRESHOLD;
-	/**
-	 * Size of the window in pixels.
-	 */
-	public static final int FRAME_DIMENSION = 1000;
-	/**
-	 * The delay between each grain is draped. Increase this value will slow down the process.
-	 */
-	public static final int DELAY = 10;
 	/**
 	 * Total number grains of sand to drop.
 	 */
 	private final int TOTAL_GRAINS = 1000;
 	private Cell[][] cells;
 	private int offset, sideLength;	//offset is half of sideLength
-	private ExecutorService executor = Executors.newSingleThreadExecutor();
-	private volatile boolean completed = false;
+	/*
+	The indexes in the array cells will not correspond to the coordinates of the cell.
+	Array indexes start at 0, where as coordinates depends on the size of the grid.
+	Coordinates have origin (0, 0) at the center of the grid. The cell at the
+	center of the grid is at indexes [offset][offset] in cells.
+	For a cell with coordinate (x, y), the corresponding indexes are
+	[x + offset][y + offset]
+	 */
 	
 	public Ground(int spillThreshold) {
 		SPILL_THRESHOLD = spillThreshold;
@@ -38,38 +30,21 @@ public class Ground extends JPanel {
 		offset = sideLength / 2;
 		addSand(0, 0);
 	}
-	
+
 	public Ground() {
 		this(4);
 	}
 	
 	public static void main(String[] args) throws InterruptedException {
-		//setup the window
 		Ground ground = new Ground();
-		JFrame frame = new JFrame("Sand Pile");
-		ground.setBackground(Color.WHITE);
-		frame.setPreferredSize(new Dimension(FRAME_DIMENSION, FRAME_DIMENSION));
-		frame.add(ground);
-		frame.pack();
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.setVisible(true);
-		//thread for repaint
-		//I found this more intuitive than the lambda version
-		ground.executor.submit(new Runnable() {
-			@Override
-			public void run() {
-				while (!ground.completed)
-					ground.repaint();
-			}
-		});
 
-		for (int grain = 0; grain < ground.TOTAL_GRAINS; grain++) {
-			//add a sand, update, wait
-			ground.addSand(0, 0);
-			ground.updateSandPile();
-			Thread.sleep(DELAY);
-		}
-		ground.completed = true;
+		//add TOTAL_GRAINS grains of sand to the ground
+
+		/*
+		for the number of grains in TOTAL_GRAINS:
+			add one grain of sand to center;
+			update the entire grid;
+		 */
 	}
 
 	/**
@@ -78,11 +53,19 @@ public class Ground extends JPanel {
 	 * @param y	the y location of the cell
 	 */
 	public void addSand(int x, int y) {
-		Cell cell = cells[x + offset][y + offset];
-		if (cell == null)
-			cells[x + offset][y + offset] = new Cell(x, y, this);
-		else
-			cell.addSand();
+		/*
+		Remember about offset. If you don't know what I'm talking about, refer
+		to the block of comment near the beginning.
+		 */
+//		Cell cell = cells[x + offset][y + offset];
+//		if (cell == null)
+//			cells[x + offset][y + offset] = new Cell(x, y, this);
+//		else
+//			cell.addSand();
+		/*
+		get cell at the specified indexes;
+		add one grain of sand to that cell;
+		 */
 	}
 
 	/**
@@ -95,34 +78,29 @@ public class Ground extends JPanel {
 		return cells[x][y];	//no offset is intended
 	}
 
+	/**
+	 * Update this sand pile until no more cell should spill.
+	 */
 	public void updateSandPile() {
-		boolean completed = false;
-		while (!completed) {
-			completed = true;
-			for (Cell[] row : cells) {
-				for (Cell cell : row) {
-					if (cell == null)
-						continue;
-					if (cell.checkSpill())
-						completed = false;
-				}
-			}
-		}
-	}
-
-	@Override
-	public void paintComponent(Graphics graphics) {
-		BufferedImage image = new BufferedImage(sideLength, sideLength, BufferedImage.TYPE_INT_RGB);
-		for (int x = 0; x < sideLength; x++) {
-			for (int y = 0; y < sideLength; y++) {
-				Cell cell = getCellAt(x, y);
-				if (cell == null)
-					image.setRGB(x, y, Color.WHITE.getRGB());
-				else {
-					image.setRGB(x, y, cell.getColor());
-				}
-			}
-		}
-		graphics.drawImage(image, 0, 0, FRAME_DIMENSION, FRAME_DIMENSION, null);
+//		boolean completed = false;
+//		while (!completed) {
+//			completed = true;
+//			for (Cell[] row : cells) {
+//				for (Cell cell : row) {
+//					if (cell == null)
+//						continue;
+//					if (cell.checkSpill())
+//						completed = false;
+//				}
+//			}
+//		}
+		/*
+		while there still are cells with too much sand:
+			for every row on the grid:
+				for every cell in that row:
+					if the cell have too much sand:
+						spill;
+					otherwise do nothing;
+		 */
 	}
 }
