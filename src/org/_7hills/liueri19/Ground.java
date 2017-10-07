@@ -33,10 +33,9 @@ public class Ground extends JPanel {
 	
 	public Ground(int spillThreshold) {
 		SPILL_THRESHOLD = spillThreshold;
-		sideLength = (int) (Math.sqrt(TOTAL_GRAINS / Math.PI)) * 2;	//guaranteed even
+		offset = (int) (Math.sqrt(TOTAL_GRAINS / Math.PI));
+		sideLength = offset * 2;	//guaranteed even
 		cells = new Cell[sideLength][sideLength];	//init a 2d array guaranteed to hold all sand
-		offset = sideLength / 2;
-		addSand(0, 0);
 	}
 	
 	public Ground() {
